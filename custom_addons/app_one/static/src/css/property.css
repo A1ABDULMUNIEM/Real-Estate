@@ -1,0 +1,11 @@
+.header_custom table thead > tr > th {
+  background-color: #C9E6F0 !important;
+  color: white !important;
+  text-align: center !important;
+
+}
+.header_custom table thead > tr > th:nth-child(2) {
+  background-color: #78B3CE !important;
+  width:250px !important;
+}
+

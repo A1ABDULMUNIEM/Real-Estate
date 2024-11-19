@@ -1,0 +1,45 @@
+<odoo>
+    <!--    tag's tree view-->
+
+    <record id="tags_view_tree" model="ir.ui.view">
+        <field name="name">tags tree</field>
+        <field name="model">tag</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+<!--    tag's form view-->
+    <record id="tag_view_form" model="ir.ui.view">
+        <field name="name">tag form</field>
+        <field name="model">tag</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oi_title">
+                        <lable for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--    tag's search view-->
+
+    <record id="tags_action" model="ir.actions.act_window">
+        <field name="name">Tag</field>
+        <field name="res_model">tag</field>
+    </record>
+    <menuitem
+            id="tags_menu"
+            name="Tag"
+            parent="owner_menu"
+            action="tags_action"
+    />
+</odoo>
