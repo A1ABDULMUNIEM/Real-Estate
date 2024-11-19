@@ -14,12 +14,13 @@ from odoo17.odoo.tools.populate import compute
 
 class Property(models.Model):
     _name = "property"
-    _description = "My first Model"
+    _description = "Property Record"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(required=1, default='New', size=7)
-    description = fields.Text()
+    description = fields.Text(tracking=1)
     postcode = fields.Char(required=1)
-    date_availability = fields.Date()
+    date_availability = fields.Date(tracking=1)
     expected_price = fields.Float(digits=(0, 3))
     selling_price = fields.Float(digits=(0, 3))
     diff = fields.Float(compute='_compute_diff', store='1', readonly='0')
@@ -42,10 +43,12 @@ class Property(models.Model):
     ], default='draft')
     owner_id = fields.Many2one('owner')
     tag_ids = fields.Many2many('tag')
-
+    owner_address = fields.Char(related='owner_id.address', readonly=0, store=0)
+    owner_phone = fields.Char(related='owner_id.phone', readonly=0, store=0)
     _sql_constraints = [
         ('unique_name', 'unique("name")', 'the name already exists!!')
     ]
+    line_ids = fields.One2many("property.line", "bedroom_id")
     @api.constrains('bedrooms')
     def _check_bedrooms_value_npt_zero(self):
         for rec in self:
@@ -103,4 +106,9 @@ class Property(models.Model):
     #     print("This is an example of overriding/changing the behavior of the method delete/unlink")
     #     return res
 
+class PropertyLine(models.Model):
+    _name="property.line"
 
+    bedroom_id = fields.Many2one('property')
+    desciription = fields.Char()
+    area = fields.Float()
