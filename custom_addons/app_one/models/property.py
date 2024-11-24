@@ -74,7 +74,7 @@ class Property(models.Model):
         for rec in self:
             print(rec)
             print("This is the computed field depends method.")
-            rec.diff = rec.expected_price - rec.selling_price
+            rec.diff = rec.selling_price - rec.expected_price
     @api.onchange('expected_price')
     def _onchange_expected_price(self):
         for rec in self:

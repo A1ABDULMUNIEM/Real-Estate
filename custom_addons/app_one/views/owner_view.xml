@@ -36,7 +36,6 @@
             </form>
         </field>
     </record>
-    <!--    owner's search view-->
 
     <record id="owners_action" model="ir.actions.act_window">
         <field name="name">Owner</field>
