@@ -4,3 +4,6 @@ from . import tag
 from . import sale_order_inherited
 from .  import client
 from . import res_partner_inherited
+from . import building
+from . import property_history
+from . import account_move_inherited

@@ -43,7 +43,7 @@
     </record>
     <menuitem
             id="owners_menu"
-            name="Owners"
+            name="Our Owners"
             parent="owner_menu"
             action="owners_action"
     />

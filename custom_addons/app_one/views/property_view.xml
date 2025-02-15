@@ -5,12 +5,14 @@
         <field name="name">property tree</field>
         <field name="model">property</field>
         <field name="arch" type="xml">
-            <tree class="header_custom" multi_edit="1">
+            <tree class="header_custom" multi_edit="1" decoration-danger="(is_late)">
                 <field name="name"/>
                 <field name="description"/>
                 <field name="selling_price"/>
                 <field name="owner_id"/>
                 <field name="state"/>
+                <field name="expected_selling_date"/>
+                <field name="is_late" invisible="1"/>
                 <field name="facades" optional="1"/>
                 <field name="garden" optional="1"/>
                 <field name="garage" optional="1"/>
@@ -26,10 +28,18 @@
         <field name="arch" type="xml">
             <form create="1" edit="1" delte="0">
                 <sheet>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="action_related_owner" string="Owner" icon="fa-user" type="object" invisible="not owner_id"/>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <widget name="web_ribbon" title="Sold" bg_color="text-bg-success" invisible="state != 'sold' "/>
+
 <!--                    <field name="state" widget="statusbar" statusbar_visible="draft, sold" />  [options="{'clickable':1}"] -->
                     <header>
+                        <button name="action" type="object" class="btn-primary" string="Action"/>
+                        <button name="get_properties" type="object" class="btn-primary" string="get_properties"/>
                         <button name="state_draft" type="object" class="btn-primary" string="Set To Draft"
-                                    invisible="state == 'draft'"/>
+                                    invisible="state in ('draft', 'closed')"/>
                         <button name="state_pending" type="object" class="btn-primary" string="Set To Pending"
                                     invisible="state != 'draft'"/>
                         <button name="state_sold" type="object" class="btn-primary" string="Set To Sold"
@@ -37,31 +47,42 @@
                         <field name="state" widget="statusbar"/>
                     </header>
                     <div class="oi_title">
-                        <label for="name"/>
+                        <label for="ref"/>
                         <h1>
-                            <field name="name"/>
+                            <field name="ref"/>
                         </h1>
+                    </div>
+                    <div class="oi_title">
+                        <label for="name"/>
+                        <h4>
+                            <field name="name" readonly="state == 'closed'"/>
+                        </h4>
                     </div>
                     <group>
                         <group string="General Info.">
-                            <field name="expected_price"/>
-                             <field name="selling_price"/>
-                            <field name="diff"/>
-                            <field name="postcode"/>
-                            <field name="date_availability" required="1"/>
+                            <field name="expected_price" readonly="state == 'closed'"/>
+                            <field name="active"/>
+                             <field name="selling_price" readonly="state == 'closed'"/>
+                            <field name="diff" readonly="state == 'closed'"/>
+                            <field name="postcode" readonly="state == 'closed'"/>
+                            <field name="date_availability" required="1" readonly="state == 'closed'"/>
+                            <field name="expected_selling_date" readonly="state == 'closed'"/>
+                            <field name="is_late" invisible="1" readonly="state == 'closed'"/>
 
 
                         </group>
 
                         <group string="Additional Info.">
-                            <field name="owner_id"/>
-                            <field name="owner_address"/>
-                            <field name="owner_phone"/>
-                            <field name="facades" />
-                            <field name="garden" />
-                            <field name="garage" />
-                            <field name="bedrooms" />
-                            <field name="living_area" />
+                            <field name="owner_id" readonly="state == 'closed'"/>
+                            <field name="create_time" readonly="1"/>
+                            <field name="next_time" readonly="1"/>
+                            <field name="owner_address" readonly="state == 'closed'"/>
+                            <field name="owner_phone" readonly="state == 'closed'"/>
+                            <field name="facades" readonly="state == 'closed'" groups='app_one.security_groups'/>
+                            <field name="garden" readonly="state == 'closed'"/>
+                            <field name="garage" readonly="state == 'closed'"/>
+                            <field name="bedrooms" readonly="state == 'closed'"/>
+                            <field name="living_area" readonly="state == 'closed'" />
                             <field name="tag_ids" widget="many2many_tags"/>
 
                         </group>
@@ -71,7 +92,7 @@
                         <div class="oi_title">
                             <label for="description"/>
                             <h1>
-                                <field name="description" required="1"/>
+                                <field name="description" required="1" />
                             </h1>
 
                         </div>
@@ -119,13 +140,49 @@
 
     </record>
 
+
+
+    <record id="property_server_action" model="ir.actions.server">
+         <field name="name">Close</field>
+         <field name="model_id" ref="model_property"/>
+         <field name="binding_model_id" ref="model_property"/>
+         <field name="state">code</field>
+         <field name="code">
+             action = records.state_closed()
+         </field>
+
+
+    </record>
+
+    <record id="change_state_wizard_action" model="ir.actions.server">
+        <field name="name">Change State</field>
+        <field name="model_id" ref="model_property"/>
+        <field name="binding_model_id" ref="model_property"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.change_state_wizard()
+        </field>
+    </record>
+
+    <record id="property_cron" model="ir.cron">
+        <field name="name"> Property </field>
+        <field name="model_id" ref="model_property"/>
+        <field name="state">code</field>
+        <field name="code">model.check_expected_selling_date()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+
+    </record>
+
     <record id="property_action" model="ir.actions.act_window">
         <field name="name">Property</field>
         <field name="res_model">property</field>
     </record>
     <menuitem
             id="property_menu_item"
-            name="Properties"
+            name="Our Properties"
             parent="properties_menu"
             action="property_action"
 
